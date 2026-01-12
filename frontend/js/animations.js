@@ -131,3 +131,5 @@ const animationStyles = `
   }
 }
 `;
+
+window.animations = animations;

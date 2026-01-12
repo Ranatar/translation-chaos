@@ -117,6 +117,14 @@ const gameModes = {
       </div>
     `;
 
+    const scoreCircle = document.getElementById('score-circle');
+    animations.pulse(scoreCircle, 1000);
+    
+    // Конфетти для отличного результата
+    if (evaluation.score >= 90) {
+      setTimeout(() => animations.confetti(), 500);
+    }
+
     document.getElementById('view-details').addEventListener('click', () => {
       displayResults(translationResult);
       container.classList.add('hidden');

@@ -230,7 +230,7 @@ function setupEventListeners() {
 async function runTranslation() {
   const text = document.getElementById('input-text').value.trim();
   if (!text) {
-    alert('Введите текст для перевода');
+    showError('Введите текст для перевода', textInput);
     return;
   }
 
@@ -254,6 +254,20 @@ async function runTranslation() {
 
   try {
     const result = await api.runTranslation(text, currentChain, currentPreset);
+
+    const totalSteps = result.results.length;
+    for (let i = 0; i < totalSteps; i++) {
+      animations.updateProgress(
+        i + 1, 
+        totalSteps, 
+        `Обработка шага ${i + 1}/${totalSteps}: ${result.results[i].language}`
+      );
+      await new Promise(resolve => setTimeout(resolve, 300));
+    }
+    
+    currentRun = result;
+    hideProgress();
+
     currentRun = result;
     
     hideProgress();
@@ -295,11 +309,21 @@ async function displayResults(result) {
   const section = document.getElementById('results-section');
   section.classList.remove('hidden');
 
+  animations.pulse(section, 800);
+
   // Основные метрики
   const driftPercent = Math.round(result.overallDrift * 100);
   document.getElementById('overall-drift').textContent = `${driftPercent}%`;
   document.getElementById('original-text').textContent = result.results[0].text;
   document.getElementById('final-text').textContent = result.finalText;
+
+  const driftElement = document.getElementById('overall-drift');
+  await animations.typeText(driftElement, `${driftPercent}%`, 50);
+  
+  // Конфетти для экстремального дрейфа
+  if (driftPercent > 80) {
+    animations.confetti();
+  }
 
   // График дрейфа
   visualizations.renderDriftChart(result.analysis, result.mutations);
@@ -329,37 +353,53 @@ async function displayResults(result) {
   section.scrollIntoView({ behavior: 'smooth' });
 }
 
-function displaySteps(results, detailedAnalysis) {
+async function displaySteps(results, detailedAnalysis) {
   const stepsList = document.getElementById('steps-list');
-  stepsList.innerHTML = results.map((step, i) => {
-    if (i === 0) return '';
+  stepsList.innerHTML = ''; // Очистить
+    for (let i = 0; i < results.length; i++) {
+    if (i === 0) continue;
     
+    const step = results[i];
     const analysis = detailedAnalysis[i - 1];
     const similarity = analysis?.localSimilarity || 0;
     const simPercent = Math.round(similarity * 100);
     const colorClass = simPercent > 80 ? 'high' : simPercent > 60 ? 'medium' : 'low';
     
-    return `
-      <div class="step-card ${colorClass}" data-step="${i}" onclick="showStepDetail(${i})">
-        <div class="step-header">
-          <span class="step-number">Шаг ${i}</span>
-          <span class="step-lang">${step.from} → ${step.language}</span>
-          <span class="step-similarity">${simPercent}%</span>
-          ${analysis?.changeType ? `
-            <span class="step-change-icon">${analysis.changeType.icon}</span>
-          ` : ''}
-        </div>
-        <div class="step-text">${step.text || 'Ошибка перевода'}</div>
-        ${step.error ? `<div class="step-error">${step.error}</div>` : ''}
-        ${analysis ? `
-          <div class="step-meta">
-            <small>${analysis.changeType?.label || ''}</small>
-          </div>
+    const stepCard = document.createElement('div');
+    stepCard.className = `step-card ${colorClass}`;
+    stepCard.dataset.step = i;
+    stepCard.onclick = () => showStepDetail(i);
+    
+    stepCard.innerHTML = `
+      <div class="step-header">
+        <span class="step-number">Шаг ${i}</span>
+        <span class="step-lang">${step.from} → ${step.language}</span>
+        <span class="step-similarity">${simPercent}%</span>
+        ${analysis?.changeType ? `
+          <span class="step-change-icon">${analysis.changeType.icon}</span>
         ` : ''}
-        <span class="step-expand-icon">→</span>
       </div>
+      <div class="step-text">${step.text || 'Ошибка перевода'}</div>
+      ${step.error ? `<div class="step-error">${step.error}</div>` : ''}
+      ${analysis ? `
+        <div class="step-meta">
+          <small>${analysis.changeType?.label || ''}</small>
+        </div>
+      ` : ''}
+      <span class="step-expand-icon">→</span>
     `;
-  }).join('');
+    
+    stepsList.appendChild(stepCard);
+    
+    // Анимация появления
+    stepCard.style.opacity = '0';
+    stepCard.style.transform = 'translateY(20px)';
+    setTimeout(() => {
+      stepCard.style.transition = 'all 0.3s ease';
+      stepCard.style.opacity = '1';
+      stepCard.style.transform = 'translateY(0)';
+    }, i * 50);
+  }
 }
 
 function displayMutations(mutations) {
@@ -533,6 +573,14 @@ function closeModal() {
 function showAchievementNotifications(achievements) {
   achievements.forEach((achievement, index) => {
     setTimeout(() => {
+      animations.achievementUnlock(achievement);
+
+      if (achievement.category === 'special' || achievement.score >= 100) {
+            animations.confetti();
+          }
+        }, index * 500);
+      });
+
       const notification = document.createElement('div');
       notification.className = 'achievement-notification';
       notification.innerHTML = `
@@ -676,6 +724,15 @@ async function saveResults() {
     data: currentRun
   });
   localStorage.setItem('saved_runs', JSON.stringify(saved));
+
+  function showError(message, element = null) {
+  alert(message);
+  
+  // ✅ НОВОЕ: Встряска элемента при ошибке
+  if (element) {
+    animations.shake(element);
+  }
+}
   
   alert('Результаты сохранены локально!');
 }
