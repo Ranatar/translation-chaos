@@ -1,6 +1,6 @@
 import express from 'express';
 import achievementsService from '../services/achievements.js';
-import achievementsDb from '../database/achievements-db.js';
+import db from '../database/db.js'
 
 const router = express.Router();
 
