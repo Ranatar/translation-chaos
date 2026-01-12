@@ -1,5 +1,6 @@
 import embeddingService from './embeddings.js';
 import translatorService from './translator.js';
+import db from '../database/db.js'
 
 class GameModesService {
   

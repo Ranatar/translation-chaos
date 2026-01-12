@@ -6,13 +6,13 @@ const router = express.Router();
 
 // Получить статистику пользователя
 router.get('/stats', (req, res) => {
-  const stats = achievementsDb.getUserStats();
+  const stats = db.getUserStats();
   res.json(stats);
 });
 
 // Получить все достижения с прогрессом
 router.get('/all', (req, res) => {
-  const stats = achievementsDb.getUserStats();
+  const stats = db.getUserStats();
   const achievements = achievementsService.getAllWithProgress(stats);
   res.json(achievements);
 });
@@ -26,12 +26,12 @@ router.post('/check/:runId', async (req, res) => {
       return res.status(404).json({ error: 'Run not found' });
     }
 
-    const stats = achievementsDb.getUserStats();
+    const stats = db.getUserStats();
     const unlocked = achievementsService.checkAchievements(stats, run);
 
     // Сохранить новые достижения
     for (const achievement of unlocked) {
-      achievementsDb.unlockAchievement(achievement.id);
+      db.unlockAchievement(achievement.id);
     }
 
     res.json(unlocked);

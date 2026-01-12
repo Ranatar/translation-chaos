@@ -13,7 +13,6 @@ import achievementsRoutes from './routes/achievements.js';
 
 // Database
 import db from './database/db.js';
-import achievementsDb from './database/achievements-db.js';
 
 dotenv.config();
 

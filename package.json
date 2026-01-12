@@ -19,7 +19,7 @@
     "axios": "^1.6.2",
     "node-cache": "^5.1.2",
     "natural": "^6.10.0",
-    "canvas": "^2.11.2"
+    //"canvas": "^2.11.2"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"
