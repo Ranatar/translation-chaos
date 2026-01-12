@@ -1,0 +1,497 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+header h1 {
+  font-size: 2.5em;
+  color: #667eea;
+  margin-bottom: 10px;
+}
+
+.presets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.preset-card {
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.preset-card:hover {
+  border-color: #667eea;
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.preset-card.selected {
+  border-color: #667eea;
+  background: #f0f4ff;
+}
+
+.input-section {
+  margin: 30px 0;
+}
+
+#input-text {
+  width: 100%;
+  padding: 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 16px;
+  resize: vertical;
+}
+
+.primary-btn {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 15px 40px;
+  font-size: 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.3s;
+}
+
+.primary-btn:hover {
+  background: #5568d3;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.chart-container {
+  margin: 30px 0;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 10px;
+}
+
+.step-card {
+  border-left: 4px solid #ccc;
+  padding: 15px;
+  margin: 10px 0;
+  background: #f9f9f9;
+  border-radius: 5px;
+}
+
+.step-card.high { border-left-color: #4caf50; }
+.step-card.medium { border-left-color: #ff9800; }
+.step-card.low { border-left-color: #f44336; }
+
+.history-item {
+  padding: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  margin: 10px 0;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.history-item:hover {
+  background: #f5f5f5;
+  border-color: #667eea;
+}
+
+.steps-container {
+  margin: 30px 0;
+}
+
+.step-card {
+  border-left: 4px solid #ccc;
+  padding: 20px;
+  margin: 15px 0;
+  background: #f9f9f9;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.step-card:hover {
+  background: #f0f4ff;
+  transform: translateX(5px);
+  box-shadow: 0 3px 10px rgba(102, 126, 234, 0.2);
+}
+
+.step-card.high { 
+  border-left-color: #4caf50; 
+}
+
+.step-card.medium { 
+  border-left-color: #ff9800; 
+}
+
+.step-card.low { 
+  border-left-color: #f44336; 
+}
+
+.step-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.step-number {
+  font-weight: bold;
+  color: #333;
+}
+
+.step-lang {
+  background: #667eea;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 5px;
+  font-size: 13px;
+}
+
+.step-similarity {
+  font-weight: bold;
+  padding: 4px 12px;
+  border-radius: 5px;
+}
+
+.step-card.high .step-similarity {
+  background: #4caf50;
+  color: white;
+}
+
+.step-card.medium .step-similarity {
+  background: #ff9800;
+  color: white;
+}
+
+.step-card.low .step-similarity {
+  background: #f44336;
+  color: white;
+}
+
+.step-text {
+  color: #666;
+  line-height: 1.6;
+  margin: 10px 0;
+}
+
+.step-error {
+  color: #f44336;
+  font-size: 13px;
+  margin-top: 8px;
+  padding: 8px;
+  background: #ffebee;
+  border-radius: 5px;
+}
+
+.step-expand-icon {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  color: #999;
+  font-size: 20px;
+  transition: transform 0.3s;
+}
+
+.step-card:hover .step-expand-icon {
+  transform: translateX(5px);
+}
+
+/* ====== ИНТЕРЕСНЫЕ МУТАЦИИ ====== */
+.mutations-section {
+  margin: 30px 0;
+  padding: 20px;
+  background: #fff8e1;
+  border-radius: 10px;
+  border-left: 4px solid #ff9800;
+}
+
+.mutations-section h3 {
+  color: #f57c00;
+  margin-bottom: 15px;
+}
+
+.mutation-item {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 10px 0;
+  border-left: 3px solid #ff9800;
+}
+
+.mutation-type {
+  font-size: 12px;
+  color: #f57c00;
+  text-transform: uppercase;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.mutation-description {
+  color: #666;
+  font-size: 14px;
+}
+
+/* ====== СЕЛЕКТОР РЕЖИМОВ ====== */
+.mode-selector-tabs {
+  display: flex;
+  gap: 10px;
+  margin: 30px 0;
+  flex-wrap: wrap;
+}
+
+.mode-tab {
+  flex: 1;
+  min-width: 150px;
+  padding: 20px;
+  background: #f9f9f9;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: center;
+}
+
+.mode-tab:hover {
+  border-color: #667eea;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+}
+
+.mode-tab.active {
+  border-color: #667eea;
+  background: #f0f4ff;
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.mode-tab-icon {
+  font-size: 36px;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.mode-tab-title {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.mode-tab-description {
+  font-size: 13px;
+  color: #666;
+}
+
+/* ====== ЧЕЛЛЕНДЖИ ====== */
+.daily-challenges {
+  margin: 30px 0;
+  padding: 30px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20px;
+  color: white;
+}
+
+.daily-challenges h2 {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.challenges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.challenge-card {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 25px;
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s;
+}
+
+.challenge-card:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-5px);
+}
+
+.challenge-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.challenge-difficulty {
+  font-size: 14px;
+}
+
+.challenge-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.challenge-description {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+.challenge-reward {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8px 15px;
+  border-radius: 20px;
+  font-size: 12px;
+  display: inline-block;
+}
+
+.challenge-status {
+  margin-top: 15px;
+  text-align: right;
+}
+
+.challenge-status.completed {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+/* ====== ЭКСПОРТ ====== */
+.export-options {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.export-btn {
+  background: white;
+  color: #667eea;
+  border: 2px solid #667eea;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.export-btn:hover {
+  background: #667eea;
+  color: white;
+}
+
+.export-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ====== СТАТИСТИКА ПОЛЬЗОВАТЕЛЯ ====== */
+.user-stats-panel {
+  background: white;
+  border-radius: 15px;
+  padding: 30px;
+  margin: 30px 0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  padding: 25px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.stat-value {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  font-size: 14px;
+  opacity: 0.9;
+  text-transform: uppercase;
+}
+
+/* ====== TOOLTIPS ====== */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 200px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 10px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -100px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}

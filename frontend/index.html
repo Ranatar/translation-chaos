@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Translation Chaos Generator - исследуйте семантический дрейф через языковые барьеры">
+  <title>Translation Chaos Generator</title>
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/game-modes.css">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@2.0.1/dist/chartjs-chart-matrix.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🌍 Translation Chaos Generator</h1>
+      <p>Семантический дрейф через языковые барьеры</p>
+    </header>
+
+    <main>
+      <!-- Статистика пользователя -->
+      <section id="user-stats-container"></section>
+
+      <!-- Ежедневные челленджи -->
+      <section id="daily-challenges-container"></section>
+
+      <!-- Достижения -->
+      <section id="achievements-container"></section>
+
+      <!-- Селектор режимов -->
+      <section id="mode-selector"></section>
+
+      <!-- Выбор цепочки -->
+      <section class="mode-selector">
+        <h2>Выберите цепочку языков</h2>
+        <div id="presets-container" class="presets-grid">
+          <!-- Загружается динамически -->
+        </div>
+        
+        <div class="custom-chain">
+          <h3>Или создайте свою:</h3>
+          <div id="chain-builder">
+            <select id="lang-start">
+              <option value="ru">Русский (RU)</option>
+              <option value="en">English (EN)</option>
+            </select>
+            <button id="add-lang" class="secondary-btn">+ Добавить язык</button>
+          </div>
+          <div id="custom-chain-display"></div>
+        </div>
+      </section>
+
+      <!-- Ввод текста -->
+      <section class="input-section">
+        <h2>Введите текст</h2>
+        <textarea 
+          id="input-text" 
+          rows="4" 
+          placeholder="Введите текст для перевода..."></textarea>
+        <button id="run-btn" class="primary-btn">🚀 Запустить хаос!</button>
+      </section>
+
+      <!-- Анимация процесса -->
+      <section id="animation-container" class="hidden"></section>
+
+      <!-- Прогресс -->
+      <section id="progress-section" class="hidden">
+        <h2>Процесс перевода</h2>
+        <div class="progress-bar">
+          <div id="progress-fill" class="progress-fill"></div>
+        </div>
+        <p id="progress-text">Подготовка...</p>
+      </section>
+
+      <!-- Результаты -->
+      <section id="results-section" class="hidden">
+        <h2>Результаты</h2>
+        
+        <div class="result-summary">
+          <div class="metric">
+            <span class="label">Общий дрейф:</span>
+            <span id="overall-drift" class="value">0%</span>
+          </div>
+          <div class="metric">
+            <span class="label">Исходный текст:</span>
+            <div id="original-text" class="text-display"></div>
+          </div>
+          <div class="metric">
+            <span class="label">Финальный текст:</span>
+            <div id="final-text" class="text-display"></div>
+          </div>
+        </div>
+
+        <!-- Экспорт -->
+        <div id="export-options"></div>
+
+        <!-- График дрейфа -->
+        <div class="chart-container">
+          <h3>📈 График семантического дрейфа</h3>
+          <canvas id="drift-chart"></canvas>
+        </div>
+
+        <!-- Тепловая карта -->
+        <div id="heatmap-container" class="chart-container">
+          <h3>🔥 Тепловая карта попарных сходств</h3>
+        </div>
+
+        <!-- 2D траектория -->
+        <div id="trajectory-container" class="chart-container">
+          <h3>🗺️ 2D траектория семантического дрейфа</h3>
+        </div>
+
+        <!-- Интересные мутации -->
+        <div id="mutations-container"></div>
+
+        <!-- Дерево ключевых слов -->
+        <div id="keyword-tree-container"></div>
+
+        <!-- Пошаговые результаты -->
+        <div class="steps-container">
+          <h3>📋 Пошаговая трансформация</h3>
+          <p class="steps-hint">💡 Кликните на любой шаг для детального анализа</p>
+          <div id="steps-list"></div>
+        </div>
+
+        <div class="actions">
+          <button id="save-btn" class="secondary-btn">💾 Сохранить</button>
+          <button id="repeat-btn" class="secondary-btn">🔄 Повторить</button>
+          <button id="new-btn" class="primary-btn">✨ Новый перевод</button>
+        </div>
+      </section>
+
+      <!-- История -->
+      <section class="history-section">
+        <h2>📜 История запусков</h2>
+        <div id="history-list"></div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Made with ❤️ for linguistic chaos enthusiasts</p>
+      <p><small>Version 1.0.0</small></p>
+    </footer>
+  </div>
+
+  <!-- Overlay для игровых режимов -->
+  <div id="game-mode-overlay" class="game-overlay hidden"></div>
+  <div id="game-mode-container" class="hidden"></div>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/visualizations.js"></script>
+  <script src="js/game-modes.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
