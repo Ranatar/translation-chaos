@@ -139,6 +139,7 @@ const gameModes = {
   // ====== АРХЕОЛОГ ======
   async initArcheologist(runId) {
     this.currentMode = 'archeologist';
+    this.currentRunId = runId;
     
     const game = await api.initArcheologistGame(runId);
     this.currentGame = game;
@@ -198,7 +199,7 @@ const gameModes = {
     // Отправка
     document.getElementById('submit-archeologist').addEventListener('click', async () => {
       const evaluation = await api.evaluateArcheologist(
-        this.currentGame.runId || 'current',
+        this.currentRunId,
         selectedStep
       );
       
@@ -253,6 +254,7 @@ const gameModes = {
   // ====== ОБРАТНАЯ ИНЖЕНЕРИЯ ======
   async initReverse(runId) {
     this.currentMode = 'reverse';
+    this.currentRunId = runId;
     
     const game = await api.initReverseGame(runId);
     this.currentGame = game;
@@ -339,7 +341,7 @@ const gameModes = {
       }
 
       const evaluation = await api.evaluateReverse(
-        this.currentGame.runId || 'current',
+        this.currentRunId,
         guess,
         usedHints
       );

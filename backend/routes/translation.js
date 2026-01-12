@@ -31,21 +31,27 @@ router.post('/run', async (req, res) => {
     // Анализируем семантику
     const analysis = await embeddingService.analyzeChain(results);
 
+    // Вычисляем метрики для сохранения
+    const overallDrift = 1 - (analysis[analysis.length - 1]?.similarity || 0);
+    const finalText = results[results.length - 1]?.text;
+
     // Сохраняем в БД
     const runId = db.saveTranslationRun({
       originalText: text,
       chain: JSON.stringify(chain),
       results: JSON.stringify(results),
       analysis: JSON.stringify(analysis),
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      overallDrift: overallDrift,
+      finalText: finalText
     });
 
     res.json({
       runId,
       results,
       analysis,
-      finalText: results[results.length - 1].text,
-      overallDrift: 1 - (analysis[analysis.length - 1]?.similarity || 0)
+      finalText: finalText,
+      overallDrift: overallDrift
     });
 
   } catch (error) {

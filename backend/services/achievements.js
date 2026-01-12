@@ -178,6 +178,11 @@ class AchievementsService {
   checkAllContinents(run) {
     if (!run || !run.chain) return false;
 
+    // Парсим chain если это JSON строка
+    const chain = typeof run.chain === 'string' 
+      ? JSON.parse(run.chain) 
+      : run.chain;
+
     const continents = {
       africa: ['sw', 'am', 'ha', 'ig', 'yo', 'zu'],
       asia: ['zh', 'ja', 'ko', 'th', 'vi', 'hi', 'ar', 'he', 'fa'],
@@ -188,7 +193,7 @@ class AchievementsService {
 
     const usedContinents = new Set();
     
-    for (const lang of run.chain) {
+    for (const lang of chain) {
       for (const [continent, languages] of Object.entries(continents)) {
         if (languages.includes(lang)) {
           usedContinents.add(continent);
@@ -202,7 +207,12 @@ class AchievementsService {
   checkLoop(run) {
     if (!run || !run.results) return false;
 
-    const texts = run.results.map(r => r.text?.toLowerCase().trim());
+    // Парсим results если это JSON строка
+    const results = typeof run.results === 'string'
+      ? JSON.parse(run.results)
+      : run.results;
+
+    const texts = results.map(r => r.text?.toLowerCase().trim());
     const seen = new Set();
 
     for (let i = 1; i < texts.length - 1; i++) { // игнорируем первый и последний

@@ -227,8 +227,16 @@ function setupEventListeners() {
   document.getElementById('save-btn')?.addEventListener('click', saveResults);
 }
 
+function showError(message, element = null) {
+  alert(message);
+  if (element && typeof animations !== 'undefined') {
+    animations.shake(element);
+  }
+}
+
 async function runTranslation() {
-  const text = document.getElementById('input-text').value.trim();
+  const textInput = document.getElementById('input-text');
+  const text = textInput.value.trim();
   if (!text) {
     showError('Введите текст для перевода', textInput);
     return;
@@ -576,25 +584,8 @@ function showAchievementNotifications(achievements) {
       animations.achievementUnlock(achievement);
 
       if (achievement.category === 'special' || achievement.score >= 100) {
-            animations.confetti();
-          }
-        }, index * 500);
-      });
-
-      const notification = document.createElement('div');
-      notification.className = 'achievement-notification';
-      notification.innerHTML = `
-        <div class="achievement-notification-header">
-          <span class="achievement-notification-icon">${achievement.icon}</span>
-          <div class="achievement-notification-content">
-            <h3>Достижение разблокировано!</h3>
-            <p>${achievement.title}</p>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(notification);
-      
-      setTimeout(() => notification.remove(), 3500);
+        animations.confetti();
+      }
     }, index * 500);
   });
 }
@@ -725,14 +716,6 @@ async function saveResults() {
   });
   localStorage.setItem('saved_runs', JSON.stringify(saved));
 
-  function showError(message, element = null) {
-  alert(message);
-  
-  // ✅ НОВОЕ: Встряска элемента при ошибке
-  if (element) {
-    animations.shake(element);
-  }
-}
   
   alert('Результаты сохранены локально!');
 }
