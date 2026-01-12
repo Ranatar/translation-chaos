@@ -563,8 +563,11 @@ function setupExportButtons(runId) {
       <button class="export-btn" onclick="api.downloadExport(${runId}, 'markdown')">
         <span>📝</span> Markdown
       </button>
-      <button class="export-btn" onclick="api.downloadExport(${runId}, 'chart')">
-        <span>📊</span> График PNG
+      <button class="export-btn" onclick="exportUtils.exportChartToPNG('drift-chart', 'drift_${runId}.png')">
+        <span>📊</span> График (PNG)
+      </button>
+      <button class="export-btn" onclick="exportUtils.exportAllCharts(${runId})">
+        <span>🖼️</span> Все графики
       </button>
     </div>
   `;

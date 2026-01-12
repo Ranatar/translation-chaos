@@ -17,7 +17,10 @@ const db = new Database(dbPath);
 // Включить WAL режим для лучшей производительности
 db.pragma('journal_mode = WAL');
 
-// Полная схема базы данных
+// ============================================
+// ИНИЦИАЛИЗАЦИЯ СХЕМЫ БАЗЫ ДАННЫХ
+// ============================================
+
 db.exec(`
   -- Основная таблица переводов
   CREATE TABLE IF NOT EXISTS translation_runs (
@@ -97,8 +100,16 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_challenge_date ON daily_challenges(date);
 `);
 
+// ============================================
+// ЭКСПОРТ ВСЕХ ФУНКЦИЙ
+// ============================================
+
 export default {
-  // Translation runs
+  
+  // ============================================
+  // TRANSLATION RUNS
+  // ============================================
+  
   saveTranslationRun(data) {
     const stmt = db.prepare(`
       INSERT INTO translation_runs 
@@ -157,7 +168,10 @@ export default {
     }));
   },
 
-  // User stats
+  // ============================================
+  // USER STATS
+  // ============================================
+  
   getUserStats() {
     const stmt = db.prepare('SELECT * FROM user_stats WHERE id = 1');
     const row = stmt.get();
@@ -215,7 +229,10 @@ export default {
     this.updateStats(updates);
   },
 
-  // Game results
+  // ============================================
+  // GAME RESULTS
+  // ============================================
+  
   saveGameResult(data) {
     const stmt = db.prepare(`
       INSERT INTO game_results (mode, run_id, score, data, timestamp)
@@ -250,7 +267,10 @@ export default {
     }));
   },
 
-  // Achievements
+  // ============================================
+  // ACHIEVEMENTS
+  // ============================================
+  
   unlockAchievement(achievementId) {
     const stats = this.getUserStats();
     
@@ -269,7 +289,56 @@ export default {
     return false;
   },
 
-  // Embeddings cache
+  // Обновление статистики игр для достижений
+  updatePredictorStats(accuracy) {
+    const stats = this.getUserStats();
+    const updates = {};
+
+    if (accuracy >= 0.95) {
+      updates.perfect_predictions = stats.perfect_predictions + 1;
+    }
+
+    if (accuracy >= 0.90) {
+      updates.prediction_streak = stats.prediction_streak + 1;
+      updates.max_prediction_streak = Math.max(
+        stats.max_prediction_streak,
+        stats.prediction_streak + 1
+      );
+    } else {
+      updates.prediction_streak = 0;
+    }
+
+    if (Object.keys(updates).length > 0) {
+      this.updateStats(updates);
+    }
+  },
+
+  updateArcheologistStats(perfect) {
+    const stats = this.getUserStats();
+    const updates = {
+      archeologist_wins: stats.archeologist_wins + 1
+    };
+
+    if (perfect) {
+      updates.archeologist_perfect = stats.archeologist_perfect + 1;
+    }
+
+    this.updateStats(updates);
+  },
+
+  updateReverseStats(hintsUsed) {
+    if (hintsUsed === 0) {
+      const stats = this.getUserStats();
+      this.updateStats({
+        reverse_no_hints: stats.reverse_no_hints + 1
+      });
+    }
+  },
+
+  // ============================================
+  // EMBEDDINGS CACHE
+  // ============================================
+  
   getCachedEmbedding(text, model = 'default') {
     const stmt = db.prepare(`
       SELECT embedding FROM embeddings_cache 
@@ -295,7 +364,10 @@ export default {
     stmt.run(text, Buffer.from(buffer), model);
   },
 
-  // Daily challenges
+  // ============================================
+  // DAILY CHALLENGES
+  // ============================================
+  
   saveDailyChallenge(challengeId, date, data) {
     const stmt = db.prepare(`
       INSERT OR REPLACE INTO daily_challenges (id, date, data)
@@ -330,18 +402,39 @@ export default {
     
     // Обновить streak
     const stats = this.getUserStats();
-    const newStreak = stats.daily_streak + 1;
+    const today = new Date().toISOString().split('T')[0];
+    const lastChallenge = stats.last_daily_challenge;
+    
+    // Проверить, не пропущен ли день
+    let newStreak = stats.daily_streak;
+    if (lastChallenge) {
+      const lastDate = new Date(lastChallenge);
+      const todayDate = new Date(today);
+      const daysDiff = Math.floor((todayDate - lastDate) / (1000 * 60 * 60 * 24));
+      
+      if (daysDiff === 1) {
+        newStreak += 1; // Продолжение серии
+      } else if (daysDiff > 1) {
+        newStreak = 1; // Серия прервана
+      }
+    } else {
+      newStreak = 1; // Первый челлендж
+    }
+    
     const maxStreak = Math.max(stats.max_daily_streak, newStreak);
     
     this.updateStats({
       daily_streak: newStreak,
       max_daily_streak: maxStreak,
       challenges_completed: stats.challenges_completed + 1,
-      last_daily_challenge: new Date().toISOString().split('T')[0]
+      last_daily_challenge: today
     });
   },
 
-  // Utility
+  // ============================================
+  // UTILITY
+  // ============================================
+  
   close() {
     db.close();
   },
@@ -367,5 +460,20 @@ export default {
     
     // VACUUM для освобождения места
     db.exec('VACUUM');
+  },
+
+  // Получить статистику БД
+  getDbStats() {
+    const runs = db.prepare('SELECT COUNT(*) as count FROM translation_runs').get();
+    const games = db.prepare('SELECT COUNT(*) as count FROM game_results').get();
+    const embeddings = db.prepare('SELECT COUNT(*) as count FROM embeddings_cache').get();
+    
+    return {
+      totalRuns: runs.count,
+      totalGames: games.count,
+      cachedEmbeddings: embeddings.count,
+      dbPath,
+      dbSize: fs.statSync(dbPath).size
+    };
   }
 };
