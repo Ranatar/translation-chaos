@@ -4,12 +4,22 @@ const gameModes = {
 
   // ====== ПРЕДСКАЗАТЕЛЬ ======
   async initPredictor(text, chain) {
-    this.currentMode = 'predictor';
-    
-    const game = await api.initPredictorGame(text, chain);
-    this.currentGame = game;
+    try {
+      this.currentMode = 'predictor';
+      
+      // Показать overlay
+      document.getElementById('game-mode-overlay').classList.remove('hidden');
+      const container = document.getElementById('game-mode-container');
+      container.classList.remove('hidden');
+      
+      const game = await api.initPredictorGame(text, chain);
+      this.currentGame = game;
 
-    this.showPredictorUI(game);
+      this.showPredictorUI(game);
+    } catch (error) {
+      alert('Ошибка загрузки игры: ' + error.message);
+      this.closeGameMode();
+    }
   },
 
   showPredictorUI(game) {
@@ -61,21 +71,25 @@ const gameModes = {
     });
 
     document.getElementById('cancel-game').addEventListener('click', () => {
-      container.classList.add('hidden');
+      this.closeGameMode();
     });
   },
 
   async submitPrediction(prediction) {
-    // Запускаем перевод
-    const result = await api.runTranslation(
-      this.currentGame.text,
-      this.currentGame.chain
-    );
+    try {
+      // Запускаем перевод
+      const result = await api.runTranslation(
+        this.currentGame.text,
+        this.currentGame.chain
+      );
 
-    // Оцениваем предсказание
-    const evaluation = await api.evaluatePrediction(result.runId, prediction);
+      // Оцениваем предсказание
+      const evaluation = await api.evaluatePrediction(result.runId, prediction);
 
-    this.showPredictionResult(evaluation, result);
+      this.showPredictionResult(evaluation, result);
+    } catch (error) {
+      alert('Ошибка при оценке предсказания: ' + error.message);
+    }
   },
 
   showPredictionResult(evaluation, translationResult) {
@@ -117,34 +131,48 @@ const gameModes = {
       </div>
     `;
 
-    const scoreCircle = document.getElementById('score-circle');
-    animations.pulse(scoreCircle, 1000);
+    // ИСПРАВЛЕНО: Используем querySelector вместо getElementById
+    const scoreCircle = container.querySelector('.score-circle');
+    if (scoreCircle && typeof animations !== 'undefined') {
+      animations.pulse(scoreCircle, 1000);
+    }
     
     // Конфетти для отличного результата
-    if (evaluation.score >= 90) {
+    if (evaluation.score >= 90 && typeof animations !== 'undefined') {
       setTimeout(() => animations.confetti(), 500);
     }
 
     document.getElementById('view-details').addEventListener('click', () => {
-      displayResults(translationResult);
-      container.classList.add('hidden');
+      if (typeof displayResults === 'function') {
+        displayResults(translationResult);
+      }
+      this.closeGameMode();
     });
 
     document.getElementById('play-again').addEventListener('click', () => {
-      container.classList.add('hidden');
-      // Вернуться к выбору режима
+      this.closeGameMode();
     });
   },
 
   // ====== АРХЕОЛОГ ======
   async initArcheologist(runId) {
-    this.currentMode = 'archeologist';
-    this.currentRunId = runId;
-    
-    const game = await api.initArcheologistGame(runId);
-    this.currentGame = game;
+    try {
+      this.currentMode = 'archeologist';
+      this.currentRunId = runId;
+      
+      // Показать overlay
+      document.getElementById('game-mode-overlay').classList.remove('hidden');
+      const container = document.getElementById('game-mode-container');
+      container.classList.remove('hidden');
+      
+      const game = await api.initArcheologistGame(runId);
+      this.currentGame = game;
 
-    this.showArcheologistUI(game);
+      this.showArcheologistUI(game);
+    } catch (error) {
+      alert('Ошибка загрузки игры: ' + error.message);
+      this.closeGameMode();
+    }
   },
 
   showArcheologistUI(game) {
@@ -198,21 +226,25 @@ const gameModes = {
 
     // Отправка
     document.getElementById('submit-archeologist').addEventListener('click', async () => {
-      const evaluation = await api.evaluateArcheologist(
-        this.currentRunId,
-        selectedStep
-      );
-      
-      // Штраф за подсказку
-      if (hintUsed) {
-        evaluation.score = Math.max(0, evaluation.score - 10);
-      }
+      try {
+        const evaluation = await api.evaluateArcheologist(
+          this.currentRunId,
+          selectedStep
+        );
+        
+        // Штраф за подсказку
+        if (hintUsed) {
+          evaluation.score = Math.max(0, evaluation.score - 10);
+        }
 
-      this.showArcheologistResult(evaluation);
+        this.showArcheologistResult(evaluation);
+      } catch (error) {
+        alert('Ошибка при оценке ответа: ' + error.message);
+      }
     });
 
     document.getElementById('cancel-game').addEventListener('click', () => {
-      container.classList.add('hidden');
+      this.closeGameMode();
     });
   },
 
@@ -247,19 +279,29 @@ const gameModes = {
     `;
 
     document.getElementById('play-again').addEventListener('click', () => {
-      container.classList.add('hidden');
+      this.closeGameMode();
     });
   },
 
   // ====== ОБРАТНАЯ ИНЖЕНЕРИЯ ======
   async initReverse(runId) {
-    this.currentMode = 'reverse';
-    this.currentRunId = runId;
-    
-    const game = await api.initReverseGame(runId);
-    this.currentGame = game;
+    try {
+      this.currentMode = 'reverse';
+      this.currentRunId = runId;
+      
+      // Показать overlay
+      document.getElementById('game-mode-overlay').classList.remove('hidden');
+      const container = document.getElementById('game-mode-container');
+      container.classList.remove('hidden');
+      
+      const game = await api.initReverseGame(runId);
+      this.currentGame = game;
 
-    this.showReverseUI(game);
+      this.showReverseUI(game);
+    } catch (error) {
+      alert('Ошибка загрузки игры: ' + error.message);
+      this.closeGameMode();
+    }
   },
 
   showReverseUI(game) {
@@ -333,24 +375,28 @@ const gameModes = {
 
     // Отправка
     document.getElementById('submit-reverse').addEventListener('click', async () => {
-      const guess = document.getElementById('guess-text').value.trim();
-      
-      if (!guess) {
-        alert('Введите ваше предположение');
-        return;
+      try {
+        const guess = document.getElementById('guess-text').value.trim();
+        
+        if (!guess) {
+          alert('Введите ваше предположение');
+          return;
+        }
+
+        const evaluation = await api.evaluateReverse(
+          this.currentRunId,
+          guess,
+          usedHints
+        );
+
+        this.showReverseResult(evaluation);
+      } catch (error) {
+        alert('Ошибка при оценке ответа: ' + error.message);
       }
-
-      const evaluation = await api.evaluateReverse(
-        this.currentRunId,
-        guess,
-        usedHints
-      );
-
-      this.showReverseResult(evaluation);
     });
 
     document.getElementById('cancel-game').addEventListener('click', () => {
-      container.classList.add('hidden');
+      this.closeGameMode();
     });
   },
 
@@ -400,7 +446,16 @@ const gameModes = {
     `;
 
     document.getElementById('play-again').addEventListener('click', () => {
-      container.classList.add('hidden');
+      this.closeGameMode();
     });
+  },
+
+  // ====== ЗАКРЫТИЕ ИГРОВОГО РЕЖИМА ======
+  closeGameMode() {
+    document.getElementById('game-mode-overlay').classList.add('hidden');
+    document.getElementById('game-mode-container').classList.add('hidden');
   }
 };
+
+// Экспорт в глобальную область
+window.gameModes = gameModes;

@@ -1,20 +1,32 @@
 import express from 'express';
 import achievementsService from '../services/achievements.js';
-import db from '../database/db.js'
+import db from '../database/db.js';
 
 const router = express.Router();
 
+// ИСПРАВЛЕНО: Добавлен try-catch
 // Получить статистику пользователя
 router.get('/stats', (req, res) => {
-  const stats = db.getUserStats();
-  res.json(stats);
+  try {
+    const stats = db.getUserStats();
+    res.json(stats);
+  } catch (error) {
+    console.error('Stats error:', error);
+    res.status(500).json({ error: error.message });
+  }
 });
 
+// ИСПРАВЛЕНО: Добавлен try-catch
 // Получить все достижения с прогрессом
 router.get('/all', (req, res) => {
-  const stats = db.getUserStats();
-  const achievements = achievementsService.getAllWithProgress(stats);
-  res.json(achievements);
+  try {
+    const stats = db.getUserStats();
+    const achievements = achievementsService.getAllWithProgress(stats);
+    res.json(achievements);
+  } catch (error) {
+    console.error('Achievements error:', error);
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // Проверить достижения после запуска
@@ -41,10 +53,16 @@ router.post('/check/:runId', async (req, res) => {
   }
 });
 
+// ИСПРАВЛЕНО: Добавлен try-catch
 // Получить награды за достижение
 router.get('/reward/:achievementId', (req, res) => {
-  const reward = achievementsService.getRewards(req.params.achievementId);
-  res.json(reward);
+  try {
+    const reward = achievementsService.getRewards(req.params.achievementId);
+    res.json(reward);
+  } catch (error) {
+    console.error('Reward error:', error);
+    res.status(500).json({ error: error.message });
+  }
 });
 
 export default router;

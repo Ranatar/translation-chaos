@@ -3,32 +3,44 @@ import db from '../database/db.js';
 
 const router = express.Router();
 
+// ИСПРАВЛЕНО: Добавлен try-catch
 // Экспорт в JSON
 router.get('/json/:runId', async (req, res) => {
-  const run = db.getRun(req.params.runId);
-  
-  if (!run) {
-    return res.status(404).json({ error: 'Run not found' });
-  }
+  try {
+    const run = db.getRun(req.params.runId);
+    
+    if (!run) {
+      return res.status(404).json({ error: 'Run not found' });
+    }
 
-  res.setHeader('Content-Type', 'application/json');
-  res.setHeader('Content-Disposition', `attachment; filename="translation_${run.id}.json"`);
-  res.send(JSON.stringify(run, null, 2));
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', `attachment; filename="translation_${run.id}.json"`);
+    res.send(JSON.stringify(run, null, 2));
+  } catch (error) {
+    console.error('Export JSON error:', error);
+    res.status(500).json({ error: error.message });
+  }
 });
 
+// ИСПРАВЛЕНО: Добавлен try-catch
 // Экспорт в Markdown
 router.get('/markdown/:runId', async (req, res) => {
-  const run = db.getRun(req.params.runId);
-  
-  if (!run) {
-    return res.status(404).json({ error: 'Run not found' });
+  try {
+    const run = db.getRun(req.params.runId);
+    
+    if (!run) {
+      return res.status(404).json({ error: 'Run not found' });
+    }
+
+    const markdown = generateMarkdownReport(run);
+
+    res.setHeader('Content-Type', 'text/markdown');
+    res.setHeader('Content-Disposition', `attachment; filename="translation_${run.id}.md"`);
+    res.send(markdown);
+  } catch (error) {
+    console.error('Export Markdown error:', error);
+    res.status(500).json({ error: error.message });
   }
-
-  const markdown = generateMarkdownReport(run);
-
-  res.setHeader('Content-Type', 'text/markdown');
-  res.setHeader('Content-Disposition', `attachment; filename="translation_${run.id}.md"`);
-  res.send(markdown);
 });
 
 // Генерация Markdown отчёта

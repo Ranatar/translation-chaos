@@ -1,6 +1,5 @@
 import embeddingService from './embeddings.js';
 import translatorService from './translator.js';
-import db from '../database/db.js'
 
 class GameModesService {
   
@@ -21,9 +20,8 @@ class GameModesService {
     };
   }
 
-  async evaluatePrediction(runId, userPrediction) {
-    // Получить реальный результат из БД
-    const run = await db.getRun(runId);
+  async evaluatePrediction(run, userPrediction) {
+    // ИСПРАВЛЕНО: run object передаётся из route
     const actualDrift = run.overallDrift;
     
     const error = Math.abs(actualDrift - userPrediction);

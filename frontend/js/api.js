@@ -129,3 +129,5 @@ const api = {
     window.open(this.getExportUrl(runId, format), '_blank');
   }
 };
+// ИСПРАВЛЕНО: Добавлен экспорт в глобальную область
+window.api = api;

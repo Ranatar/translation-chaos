@@ -12,6 +12,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadUserStats();
   setupEventListeners();
   setupModeSelector();
+  
+  // ИСПРАВЛЕНО: Добавлен обработчик закрытия игровых режимов по клику на overlay
+  const gameOverlay = document.getElementById('game-mode-overlay');
+  if (gameOverlay) {
+    gameOverlay.addEventListener('click', (e) => {
+      if (e.target === gameOverlay) {
+        closeGameOverlay();
+      }
+    });
+  }
 });
 
 // ====== ЗАГРУЗКА ДАННЫХ ======
@@ -266,9 +276,6 @@ async function runTranslation() {
     const totalSteps = result.results.length;
     for (let i = 0; i < totalSteps; i++) {
       animations.updateProgress(
-        i + 1, 
-        totalSteps, 
-        `Обработка шага ${i + 1}/${totalSteps}: ${result.results[i].language}`
       );
       await new Promise(resolve => setTimeout(resolve, 300));
     }
@@ -612,19 +619,14 @@ function setupExportButtons(runId) {
   `;
 }
 
-// Глобальные функции для onclick
-window.viewRun = async (id) => {
-  const run = await api.getRun(id);
-  currentRun = run;
-  displayResults(run);
-};
-
 window.playGameWith = async (id) => {
-  const gameOverlay = document.getElementById('game-mode-container');
-  gameOverlay.classList.remove('hidden');
+  // ИСПРАВЛЕНО: Показать overlay и контейнер
+  document.getElementById('game-mode-overlay').classList.remove('hidden');
+  const gameContainer = document.getElementById('game-mode-container');
+  gameContainer.classList.remove('hidden');
   
   // Показать выбор режима
-  gameOverlay.innerHTML = `
+  gameContainer.innerHTML = `
     <h2>Выберите игровой режим</h2>
     <div class="mode-selector-tabs">
       <div class="mode-tab" onclick="gameModes.initArcheologist(${id})">
@@ -636,6 +638,15 @@ window.playGameWith = async (id) => {
         <span class="mode-tab-icon">🧠</span>
         <div class="mode-tab-title">Обратная инженерия</div>
         <div class="mode-tab-description">Угадайте исходный текст</div>
+      </div>
+    </div>
+    <button onclick="closeGameOverlay()" class="secondary-btn">Отмена</button>
+  `;
+// ИСПРАВЛЕНО: closeGameOverlay теперь скрывает оба элемента
+window.closeGameOverlay = () => {
+  document.getElementById('game-mode-container').classList.add('hidden');
+  document.getElementById('game-mode-overlay').classList.add('hidden');
+};
       </div>
     </div>
     <button onclick="closeGameOverlay()" class="secondary-btn">Отмена</button>

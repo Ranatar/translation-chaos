@@ -444,3 +444,5 @@ const visualizations = {
     return 'low';
   }
 };
+// ИСПРАВЛЕНО: Добавлен экспорт в глобальную область
+window.visualizations = visualizations;

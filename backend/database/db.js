@@ -140,6 +140,7 @@ export default {
     if (!row) return null;
     
     return {
+      runId: row.id,
       id: row.id,
       originalText: row.original_text,
       chain: JSON.parse(row.chain),
